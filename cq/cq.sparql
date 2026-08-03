@@ -1,0 +1,100 @@
+CQ1. Which representative TNU theme was used to generate the judicial draft?
+
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX ors: <https://ontojur.com.br/ontors#>
+
+SELECT ?draft ?theme ?number ?label
+WHERE {
+    ?activity a prov:Activity ;
+              prov:generated ?draft ;
+              prov:used ?theme .
+
+    ?theme a ors:Theme ;
+           ors:themeNumber ?number ;
+           rdfs:label ?label .
+}
+
+
+
+CQ2. Which legal thesis supports the generated draft?
+
+PREFIX ors: <https://ontojur.com.br/ontors#>
+
+SELECT ?draft ?thesis ?description
+WHERE {
+
+    ?draft ors:adoptsThesis ?thesis .
+
+    ?thesis
+        ors:description ?description .
+}
+
+
+CQ3. Which software agent participated in the generation of this draft?
+
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?draft ?agent
+WHERE {
+
+    ?activity
+        prov:generated ?draft ;
+        prov:wasAssociatedWith ?agent .
+}
+
+CQ4. Which judicial decision originated the draft?
+
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX ors: <https://ontojur.com.br/ontors#>
+
+SELECT ?decision ?number ?draft
+WHERE {
+
+    ?activity
+        prov:used ?decision ;
+        prov:generated ?draft .
+
+    ?decision
+        a ors:AppellateDecisionOnSFCA ;
+        ors:decisionNumber ?number .
+}
+
+
+CQ5: Return all appellate decisions associated with a given theme
+
+PREFIX ors:  <https://ontojur.com.br/ontors#>
+PREFIX tema: <https://ontojur.com.br/tnu/tema/>
+
+SELECT ?decision ?decisionNumber ?subject
+WHERE {
+
+    ?decision a ors:AppellateDecisionOnSFCA ;
+              ors:decisionNumber ?decisionNumber ;
+              ors:subject ?subject ;
+              ors:adoptsThesis ?thesis .
+
+    ?thesis ors:hasTheme tema:172 .
+}
+
+CQ6: Explaining why a judicial draft was generated.
+
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX ors: <https://ontojur.com.br/ontors#>
+
+SELECT
+    ?decision
+    ?theme
+    ?thesis
+    ?draft
+    ?agent
+WHERE {
+
+    ?activity
+        prov:used ?decision ;
+        prov:used ?theme ;
+        prov:generated ?draft ;
+        prov:wasAssociatedWith ?agent .
+
+    ?decision
+        ors:adoptsThesis ?thesis .
+}
